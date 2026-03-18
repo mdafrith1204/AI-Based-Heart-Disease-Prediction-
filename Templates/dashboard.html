@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.dashboard-title{
+font-weight:700;
+margin-bottom:35px;
+font-size:28px;
+}
+
+.stat-card{
+background:linear-gradient(135deg,#203a43,#2c5364);
+border-radius:20px;
+padding:30px;
+text-align:center;
+box-shadow:0 15px 45px rgba(0,0,0,0.35);
+transition:0.3s;
+}
+
+.stat-card:hover{
+transform:translateY(-6px);
+}
+
+.stat-number{
+font-size:36px;
+font-weight:700;
+margin-top:10px;
+color:#00e5ff;
+}
+
+.chart-card{
+background:linear-gradient(135deg,#203a43,#2c5364);
+border-radius:20px;
+padding:30px;
+box-shadow:0 15px 45px rgba(0,0,0,0.35);
+height:360px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+.table-card{
+background:linear-gradient(135deg,#203a43,#2c5364);
+border-radius:20px;
+padding:30px;
+margin-top:30px;
+box-shadow:0 15px 45px rgba(0,0,0,0.35);
+}
+
+canvas{
+width:100% !important;
+height:260px !important;
+}
+
+</style>
+
+<h2 class="dashboard-title">
+👋 Welcome, {{ session.username }}
+</h2>
+
+<!-- GUEST MODE WARNING -->
+
+{% if session.get("guest") %}
+
+<div class="alert alert-warning">
+Guest Mode: Dashboard history is not available. Login to track your heart health history.
+</div>
+
+{% endif %}
+
+{% set total = history|length %}
+{% set high = history | selectattr(0, "equalto", "High Risk") | list | length %}
+{% set low = history | selectattr(0, "equalto", "Low Risk") | list | length %}
+
+<div class="row g-4">
+
+<div class="col-md-4">
+<div class="stat-card">
+<h5>Total Predictions</h5>
+<div class="stat-number">{{ total }}</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="stat-card">
+<h5 style="color:#ff6b6b">High Risk Cases</h5>
+<div class="stat-number">{{ high }}</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="stat-card">
+<h5 style="color:#00e5ff">Low Risk Cases</h5>
+<div class="stat-number">{{ low }}</div>
+</div>
+</div>
+
+</div>
+
+<div class="row g-4 mt-3">
+
+<div class="col-md-6">
+
+<div class="chart-card">
+
+<h5 class="mb-4 text-center">📊 Risk Distribution</h5>
+
+<canvas id="riskChart"></canvas>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="chart-card">
+
+<h5 class="mb-4 text-center">📈 Prediction Trend</h5>
+
+<canvas id="trendChart"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="table-card">
+
+<h4 class="mb-4">📋 Prediction History</h4>
+
+<table class="table table-dark table-striped">
+
+<thead>
+<tr>
+<th>User</th>
+<th>Date & Time</th>
+<th>Prediction</th>
+<th>Probability</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% if history %}
+
+{% for row in history %}
+
+<tr>
+<td>{{ session.username }}</td>
+<td>{{ row[2] }}</td>
+
+<td>
+
+{% if row[0] == "High Risk" %}
+<span style="color:#ff6b6b;font-weight:600">High Risk</span>
+{% else %}
+<span style="color:#00e5ff;font-weight:600">Low Risk</span>
+{% endif %}
+
+</td>
+
+<td>{{ row[1] }}%</td>
+
+</tr>
+
+{% endfor %}
+
+{% else %}
+
+<tr>
+<td colspan="4" class="text-center">
+No predictions yet. Run a prediction first.
+</td>
+</tr>
+
+{% endif %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const highRisk = {{ high }};
+const lowRisk = {{ low }};
+
+const ctx = document.getElementById('riskChart');
+
+new Chart(ctx, {
+
+type:'doughnut',
+
+data:{
+labels:['High Risk','Low Risk'],
+datasets:[{
+data:[highRisk,lowRisk],
+backgroundColor:['#ff4d4d','#00e5ff']
+}]
+}
+
+});
+
+const dates = {{ dates|tojson if dates else [] }};
+const probabilities = {{ probabilities|tojson if probabilities else [] }};
+
+const ctx2 = document.getElementById('trendChart');
+
+new Chart(ctx2, {
+
+type:'line',
+
+data:{
+labels:dates,
+datasets:[{
+label:'Risk Probability (%)',
+data:probabilities,
+borderColor:'#00e5ff',
+backgroundColor:'rgba(0,229,255,0.25)',
+fill:true,
+tension:0.35
+}]
+}
+
+});
+
+</script>
+
+{% endblock %}

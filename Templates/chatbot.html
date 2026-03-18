@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.chatbox {
+    height: 460px;
+    overflow-y: auto;
+    background: #f4f7fb;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.msg-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.msg-user {
+    justify-content: flex-end;
+}
+
+.msg-bot {
+    justify-content: flex-start;
+}
+
+.msg-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 14.5px;
+    line-height: 1.5;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.user-bubble {
+    background: #0d6efd;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.bot-bubble {
+    background: white;
+    border: 1px solid #e4e7ec;
+    border-bottom-left-radius: 4px;
+}
+
+.chat-title {
+    font-weight: 600;
+}
+
+.chat-subtitle {
+    color: #6c757d;
+    font-size: 14px;
+}
+</style>
+
+<div class="text-center mb-3">
+    <h3 class="chat-title">🤖 HeartCare AI Assistant</h3>
+    <p class="chat-subtitle">
+        Your virtual health companion for heart care, wellness, emotional support and lifestyle guidance ❤️
+    </p>
+</div>
+
+<div class="card shadow">
+
+  <div class="card-body chatbox" id="chatbox">
+
+
+    <div class="msg-row msg-bot">
+        <div class="msg-bubble bot-bubble">
+            👨‍⚕️ Hello! I’m <b>HeartCare AI</b> 😊<br><br>
+            You can talk to me about:
+            <br>❤️ Heart health
+            <br>🥗 Diet & nutrition
+            <br>💪 Exercise guidance
+            <br>🧠 Stress & emotional wellbeing
+            <br><br>
+            I’m here to listen and support you 💙
+        </div>
+    </div>
+
+  </div>
+
+  <div class="card-footer d-flex align-items-end">
+
+    <textarea 
+        id="msg"
+        class="form-control"
+        rows="1"
+        placeholder="Type your message... (Enter = Send, Shift + Enter = New line)"
+        style="resize:none;"
+    ></textarea>
+
+    <button class="btn btn-primary ms-2 px-4" onclick="sendMsg()">
+        Send
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+function formatResponse(text) {
+    return text
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+        .replace(/\*(.*?)\*/g, "• $1");
+}
+
+function addMessage(text, type) {
+
+    let chatbox = document.getElementById("chatbox");
+
+    let row = document.createElement("div");
+    row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
+
+    let bubble = document.createElement("div");
+    bubble.className = "msg-bubble " + (type === "user" ? "user-bubble" : "bot-bubble");
+
+    bubble.innerHTML = text;
+
+    row.appendChild(bubble);
+    chatbox.appendChild(row);
+
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+async function sendMsg() {
+
+    let msgBox = document.getElementById("msg");
+    let msg = msgBox.value;
+
+    if (msg.trim() === "") return;
+
+    addMessage(msg.replace(/\n/g,"<br>"), "user");
+    msgBox.value = "";
+
+    try {
+
+        let res = await fetch("/chatbot", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ message: msg })
+        });
+
+        let data = await res.json();
+        addMessage(formatResponse(data.reply), "bot");
+
+    } catch {
+
+        addMessage("⚠️ Unable to connect. Please try again.", "bot");
+
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const inputBox = document.getElementById("msg");
+
+    inputBox.addEventListener("keydown", function (event) {
+
+        if (event.key === "Enter" && event.shiftKey) {
+            return;
+        }
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMsg();
+        }
+
+    });
+
+});
+</script>
+
+{% endblock %}

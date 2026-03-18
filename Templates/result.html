@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.risk-card{
+padding:25px;
+border-radius:12px;
+color:white;
+text-align:center;
+margin-bottom:20px;
+}
+
+.low-risk{
+background-color:#28a745;
+}
+
+.medium-risk{
+background-color:#ffc107;
+}
+
+.high-risk{
+background-color:#dc3545;
+}
+
+.chart-box{
+background:rgba(255,255,255,0.08);
+padding:30px;
+border-radius:15px;
+margin-bottom:25px;
+text-align:center;
+}
+
+.chart-container{
+max-width:180px;
+margin:auto;
+}
+
+</style>
+
+<div class="container mt-4">
+
+<h2 class="text-center mb-4">❤️ Prediction Result</h2>
+
+<div class="risk-card 
+{% if 'Low' in prediction %}
+low-risk
+{% else %}
+high-risk
+{% endif %}
+">
+
+<h3>{{ prediction }}</h3>
+<h5>Probability: {{ probability }}%</h5>
+
+</div>
+
+<div class="chart-box">
+
+<h4 class="mb-3">📊 AI Risk Visualization</h4>
+
+<div class="chart-container">
+<canvas id="riskChart"></canvas>
+</div>
+
+</div>
+
+<div class="card shadow p-4 mb-4">
+
+<h4 class="mb-3">📌 What This Means</h4>
+
+{% if 'Low' in prediction %}
+
+<p>
+Your current heart failure risk is <b>LOW</b>.
+This means your health indicators are mostly within a safe range.
+Keep maintaining a healthy lifestyle.
+</p>
+
+{% else %}
+
+<p>
+Your result indicates a <b>HIGH RISK</b> of heart failure.
+This does NOT confirm a medical emergency, but it suggests you should
+consult a doctor and follow strict health precautions.
+</p>
+
+{% endif %}
+
+</div>
+
+<div class="card shadow p-4 mb-4">
+
+<h4 class="mb-3">💡 Recommended Actions</h4>
+
+{% if 'Low' in prediction %}
+
+<ul>
+<li>🥗 Maintain a balanced low-salt diet</li>
+<li>🚶‍♂️ Walk 20–30 minutes daily</li>
+<li>💧 Stay hydrated</li>
+<li>🧘 Practice light yoga or meditation</li>
+<li>❤️ Regular health checkups every 6–12 months</li>
+</ul>
+
+{% else %}
+
+<ul>
+<li>🚶‍♂️ Light walking only (10–15 minutes)</li>
+<li>🥗 Strict low-sodium, low-fat diet</li>
+<li>⚠️ Avoid smoking and alcohol completely</li>
+<li>🛌 Take proper rest; avoid stress</li>
+<li>📞 Consult a cardiologist for evaluation</li>
+<li>🧘 Mild breathing exercises only</li>
+</ul>
+
+{% endif %}
+
+</div>
+
+<div class="text-center">
+
+<a href="/chat" class="btn btn-success btn-lg">
+💬 Ask Chatbot About This Result
+</a>
+
+<a href="/predict" class="btn btn-secondary btn-lg ms-2">
+🔄 Predict Again
+</a>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const riskProbability = parseFloat("{{ probability }}");
+
+const ctx = document.getElementById('riskChart').getContext('2d');
+
+new Chart(ctx,{
+
+type:'doughnut',
+
+data:{
+labels:['Risk','Safe'],
+
+datasets:[{
+data:[riskProbability,100-riskProbability],
+
+backgroundColor:[
+'#dc3545',
+'#28a745'
+],
+
+borderWidth:0
+}]
+},
+
+options:{
+responsive:true,
+maintainAspectRatio:true,
+cutout:'70%',
+plugins:{
+legend:{
+display:false
+}
+}
+}
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.login-page{
+display:flex;
+min-height:85vh;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* LEFT PANEL */
+
+.login-left{
+flex:1;
+background: linear-gradient(135deg,#00ffd5,#00c3ff);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:40px;
+color:black;
+text-align:center;
+}
+
+.login-left h1{
+font-weight:700;
+margin-bottom:15px;
+}
+
+.login-left p{
+max-width:420px;
+font-size:15px;
+}
+
+/* RIGHT PANEL */
+
+.login-right{
+flex:1;
+background: rgba(255,255,255,0.06);
+backdrop-filter: blur(20px);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:40px;
+}
+
+.login-card{
+width:340px;
+}
+
+.login-input{
+background:rgba(255,255,255,0.15);
+border:none;
+color:white;
+}
+
+.login-input:focus{
+background:rgba(255,255,255,0.2);
+color:white;
+box-shadow:none;
+}
+
+.guest-btn{
+background:#444;
+border:none;
+color:white;
+}
+
+.guest-btn:hover{
+background:#666;
+}
+
+</style>
+
+<div class="login-page">
+
+<!-- LEFT PANEL -->
+
+<div class="login-left">
+
+<h1>❤️ HeartCare AI</h1>
+
+<p>
+AI powered heart risk prediction system that helps you understand
+your heart health and provides intelligent medical guidance.
+</p>
+
+</div>
+
+<!-- RIGHT PANEL -->
+
+<div class="login-right">
+
+<div class="login-card">
+
+<h3 class="mb-4 text-center">Login</h3>
+
+<form method="POST">
+
+<div class="mb-3">
+<label>Email</label>
+<input type="email" name="email" class="form-control login-input" required>
+</div>
+
+<div class="mb-3">
+<label>Password</label>
+<input type="password" name="password" class="form-control login-input" required>
+</div>
+
+<button class="btn btn-medical w-100 mt-2">
+Login
+</button>
+
+</form>
+
+<!-- GUEST MODE BUTTON -->
+
+<a href="/guest" class="btn guest-btn w-100 mt-3">
+Continue as Guest
+</a>
+
+<p class="text-center mt-3">
+
+Don't have an account?
+<a href="/register" style="color:#00ffd5;">Register</a>
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

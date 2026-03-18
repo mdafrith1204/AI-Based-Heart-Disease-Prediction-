@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="hero-box">
+
+<h2>📍 Nearby Medical Services</h2>
+<p>Hospitals, Clinics and Labs around you</p>
+
+<button onclick="findHospitals()" class="btn btn-dark">
+Detect My Location
+</button>
+
+</div>
+
+
+<!-- MAP -->
+<div id="map" style="height:400px;border-radius:15px;margin-bottom:30px;"></div>
+
+
+<div class="row">
+
+<div class="col-md-6">
+<h4>🏥 Hospitals</h4>
+<div id="hospital-list"></div>
+</div>
+
+<div class="col-md-6">
+<h4>🧪 Clinics & Labs</h4>
+<div id="lab-list"></div>
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let map = L.map('map').setView([13.0827,80.2707], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:19
+}).addTo(map);
+
+
+function getDistance(lat1, lon1, lat2, lon2){
+
+let R = 6371;
+
+let dLat = (lat2-lat1) * Math.PI/180;
+let dLon = (lon2-lon1) * Math.PI/180;
+
+let a =
+Math.sin(dLat/2)*Math.sin(dLat/2)+
+Math.cos(lat1*Math.PI/180)*
+Math.cos(lat2*Math.PI/180)*
+Math.sin(dLon/2)*Math.sin(dLon/2);
+
+let c = 2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+
+return (R*c).toFixed(2);
+
+}
+
+
+function cardTemplate(h,distance){
+
+let maplink=`https://www.google.com/maps?q=${h.lat},${h.lon}`;
+
+return `
+
+<div class="main-card mb-3">
+
+<h5>${h.name}</h5>
+
+<p>
+📌 ${h.type}<br>
+📍 ${distance} km away<br>
+📞 ${h.phone}
+</p>
+
+<a href="${maplink}" target="_blank" class="btn btn-medical btn-sm">
+Open in Maps
+</a>
+
+</div>
+
+`;
+
+}
+
+
+function findHospitals(){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+let lat=position.coords.latitude;
+let lon=position.coords.longitude;
+
+map.setView([lat,lon],13);
+
+L.marker([lat,lon]).addTo(map)
+.bindPopup("You are here")
+.openPopup();
+
+
+fetch(`/nearby-hospitals?lat=${lat}&lon=${lon}`)
+.then(res=>res.json())
+.then(data=>{
+
+let hospitalHTML="";
+let labHTML="";
+
+data.hospitals.forEach(function(h){
+
+let distance=getDistance(lat,lon,h.lat,h.lon);
+
+let card=cardTemplate(h,distance);
+
+L.marker([h.lat,h.lon])
+.addTo(map)
+.bindPopup(`<b>${h.name}</b><br>${h.type}`);
+
+if(h.type.toLowerCase()=="hospital"){
+
+hospitalHTML+=card;
+
+}else{
+
+labHTML+=card;
+
+}
+
+});
+
+document.getElementById("hospital-list").innerHTML=hospitalHTML;
+document.getElementById("lab-list").innerHTML=labHTML;
+
+});
+
+});
+
+}
+
+</script>
+
+{% endblock %}

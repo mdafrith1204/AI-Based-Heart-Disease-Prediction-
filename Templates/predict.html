@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.page-title{
+    text-align:center;
+    color:white;
+    font-weight:700;
+    margin-bottom:30px;
+}
+
+.predict-card{
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    border-radius:20px;
+    padding:35px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.25);
+}
+
+.form-label{
+    font-weight:600;
+    color:#333;
+}
+
+.form-control, .form-select{
+    border-radius:10px;
+    border:1px solid #ddd;
+    padding:10px;
+    transition: all .3s ease;
+}
+
+.form-control:focus, .form-select:focus{
+    border-color:#0dcaf0;
+    box-shadow:0 0 0 3px rgba(13,202,240,.2);
+}
+
+.btn-predict{
+    background: linear-gradient(45deg,#00f2fe,#4facfe);
+    border:none;
+    padding:12px;
+    border-radius:12px;
+    color:white;
+    font-weight:600;
+    transition: all .3s ease;
+}
+
+.btn-predict:hover{
+    transform: translateY(-2px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+}
+
+</style>
+
+
+<h2 class="page-title">🩺 Enter Patient Details</h2>
+
+<div class="predict-card">
+
+<form method="POST">
+
+<div class="row g-4">
+
+<div class="col-md-4">
+<label class="form-label">Age (years)</label>
+<input type="number" name="age" class="form-control" required>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Sex</label>
+<select name="sex" class="form-select">
+<option value="1">Male</option>
+<option value="0">Female</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Anaemia</label>
+<select name="anaemia" class="form-select">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Diabetes</label>
+<select name="diabetes" class="form-select">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">High Blood Pressure</label>
+<select name="high_blood_pressure" class="form-select">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Smoking</label>
+<select name="smoking" class="form-select">
+<option value="1">Smoker</option>
+<option value="0">Non-Smoker</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Ejection Fraction (%)</label>
+<input type="number" name="ejection_fraction" class="form-control" required>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Creatinine Phosphokinase (mcg/L)</label>
+<input type="number" name="creatinine_phosphokinase" class="form-control" required>
+</div>
+
+<div class="col-md-4">
+<label class="form-label">Serum Creatinine (mg/dL)</label>
+<input type="number" step="0.1" name="serum_creatinine" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">Platelets (kiloplatelets/mL)</label>
+<input type="number" name="platelets" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">Serum Sodium (mEq/L)</label>
+<input type="number" name="serum_sodium" class="form-control" required>
+</div>
+
+</div>
+
+
+<div class="mt-4">
+<button class="btn btn-predict w-100">
+🚀 Predict Heart Risk
+</button>
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}
